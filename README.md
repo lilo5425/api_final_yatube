@@ -6,11 +6,11 @@ REST API для социальной сети блогов с возможнос
 Cоздать и активировать виртуальное окружение:
 
 ```
-python3 -m venv .venv
+python3 -m venv venv
 ```
 
 ```
-source .venv/bin/activate
+source venv/bin/activate
 ```
 
 Установить зависимости из файла requirements.txt:
