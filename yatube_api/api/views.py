@@ -7,11 +7,11 @@ from .serializers import (
     CommentSerializer,
     FollowSerializer
 )
-from .permissions import OwnershipPermission
+from .permissions import IsAuthorOrReadOnly
 
 
 class PermissionViewset(viewsets.ModelViewSet):
-    permission_classes = (OwnershipPermission,)
+    permission_classes = (IsAuthorOrReadOnly,)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
@@ -33,17 +33,17 @@ class CommentViewSet(PermissionViewset):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
-    def get_queryset(self):
-        return self.get_post_obj().comments.all()
-
     def get_post_obj(self):
         return get_object_or_404(
             Post,
             pk=self.kwargs.get('post_pk')
         )
 
+    def get_queryset(self):
+        return self.get_post_obj().comments.all()
+
     def perform_create(self, serializer):
-        return serializer.save(
+        serializer.save(
             author=self.request.user,
             post=self.get_post_obj()
         )
