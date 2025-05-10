@@ -30,29 +30,31 @@ class PostViewSet(PermissionViewset):
 
 
 class CommentViewSet(PermissionViewset):
+    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        return self._get_post().comments.all()
+        return self.get_post_obj().comments.all()
 
-    def _get_post(self):
+    def get_post_obj(self):
         return get_object_or_404(
             Post,
             pk=self.kwargs.get('post_pk')
         )
 
     def perform_create(self, serializer):
-        serializer.save(
+        return serializer.save(
             author=self.request.user,
-            post=self._get_post()
+            post=self.get_post_obj()
         )
 
 
 class FollowViewSet(
+    viewsets.GenericViewSet,
     mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet
+    mixins.ListModelMixin
 ):
+    queryset = Follow.objects.all()
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated,)
     filter_backends = (filters.SearchFilter,)
